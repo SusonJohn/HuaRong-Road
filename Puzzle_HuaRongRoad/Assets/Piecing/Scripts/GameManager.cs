@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
     public static GameManager Instance { get { return instance; } }
     public GameObject Wintext;
     public bool isWin = true;
+    public bool finish = false;
 
     void Awake () {
         instance = this;
@@ -31,14 +32,17 @@ public class GameManager : MonoBehaviour {
     public Text ScoreText;
     private Vector3[] piecePositions; //存储各个方块的位置,用作判断是否完成游戏
     public bool isSwaped = false; //记录是否调用SwapPiece()方法,用作判断是否完成游戏
-    void Start () {
+    public bool isStart = false;
+    public void Start () {
         //初始化empty,piecePositions的值
         empty = emptyTransform.position;
         piecePositions = new Vector3[pieces.Length];
         for (int i = 0; i < pieces.Length; i++) {
             piecePositions[i] = pieces[i].transform.position;
         }
-        SwapPiece ();
+        Wintext.SetActive (false);
+        TimesText.text = Timeval.ToString ();
+        ScoreText.text = Score.ToString ();
     }
     public void FixedUpdate () {
         if (isSwaped) {
@@ -49,7 +53,6 @@ public class GameManager : MonoBehaviour {
     }
     public void SwapPiece () //打乱方块的方法
     {
-        Wintext.SetActive (false);
         int[] step = {-1, 1, -3, 3 };
         int emptyIndex = pieces.Length - 1; //空白方块的索引
         int i = 0;
@@ -57,7 +60,7 @@ public class GameManager : MonoBehaviour {
         {
             var index = emptyIndex + step[Random.Range (0, 4)];
             if (index < 8 && index >= 0) {
-                pieces[index].GetComponent<Block> ().OnMouseDown ();
+                pieces[index].GetComponent<Block> ().Change ();
                 i++;
             }
             emptyIndex = index;
@@ -67,8 +70,10 @@ public class GameManager : MonoBehaviour {
     }
     public void SwapEmpty (Vector3 targer) //主要是判断游戏结果
     {
+        print (isSwaped);
         empty = targer;
         Score++;
+        isWin = true;
         if (emptyTransform.position == empty) {
             for (int i = 0; i < pieces.Length; i++) {
                 if (pieces[i].transform.position != piecePositions[i]) {
@@ -78,11 +83,20 @@ public class GameManager : MonoBehaviour {
             }
             if (isWin && isSwaped) {
                 Wintext.SetActive (true);
+                finish = true;
+                isStart = false;
                 Time.timeScale = 0;
             }
         }
     }
-    public void Replay () {
+    public void play () {
+        isStart = true;
+        SwapPiece ();
+        GameObject.Find ("Play").SetActive (false);
+
+    }
+    public void replay () {
         SceneManager.LoadScene (0);
+        Time.timeScale = 1;
     }
 }
