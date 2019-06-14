@@ -70,7 +70,6 @@ public class GameManager : MonoBehaviour {
     }
     public void SwapEmpty (Vector3 targer) //主要是判断游戏结果
     {
-        print (isSwaped);
         empty = targer;
         Score++;
         isWin = true;
@@ -85,7 +84,7 @@ public class GameManager : MonoBehaviour {
                 Wintext.SetActive (true);
                 finish = true;
                 isStart = false;
-                Time.timeScale = 0;
+                isSwaped = false;
             }
         }
     }
@@ -96,7 +95,9 @@ public class GameManager : MonoBehaviour {
 
     }
     public void replay () {
-        SceneManager.LoadScene (0);
-        Time.timeScale = 1;
+        SceneManager.LoadScene ("pictruing");
+    }
+    public void Menu () {
+        SceneManager.LoadScene ("Start");
     }
 }
